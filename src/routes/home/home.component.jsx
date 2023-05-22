@@ -1,5 +1,4 @@
 import Directory from "../../components/directory/directory.component";
-import {Routes, Route} from "react-router-dom";
 
 const Home = () => {
     const categories = [
