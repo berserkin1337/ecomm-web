@@ -13,7 +13,6 @@ const FormInput = ({ label, ...otherProps }) => {
           {label}
         </label>
       )}{" "}
-      <input className={"form-input"} {...otherProps} />
     </div>
   );
 };
