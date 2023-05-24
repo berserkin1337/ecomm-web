@@ -1,8 +1,15 @@
 import { useState } from "react";
-import {createAuthUserWithEmailAndPassword, createUserDocumentFromAuth} from "../../utils/firebase/firebase.utils";
-import  FormInput from "../form-input/form-input.component";
+
+import FormInput from "../form-input/form-input.component";
+import Button from "../button/button.component";
+
+import {
+  createAuthUserWithEmailAndPassword,
+  createUserDocumentFromAuth,
+} from "../../utils/firebase/firebase.utils";
+
 import "./sign-up-form.styles.scss";
-import Button  from "../button/button.component";
+
 const defaultFormFields = {
   displayName: "",
   email: "",
@@ -11,77 +18,85 @@ const defaultFormFields = {
 };
 
 const SignUpForm = () => {
+
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { displayName, email, password, confirmPassword } = formFields;
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormFields({ ...formFields, [name]: value });
-
+  const resetFormFields = () => {
+    setFormFields(defaultFormFields);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      alert("passwords do not match");
       return;
     }
+
     try {
-      const {user} = await createAuthUserWithEmailAndPassword(email, password);
-
-      const userDocRef = await createUserDocumentFromAuth(user, {displayName});
-      setFormFields(defaultFormFields);
+      const { user } = await createAuthUserWithEmailAndPassword(
+        email,
+        password
+      );
+      await createUserDocumentFromAuth(user, { displayName });
+      resetFormFields();
     } catch (error) {
-      if(error.code === "auth/email-already-in-use") {
-        alert("Cannot create user email already in use");
+      if (error.code === "auth/email-already-in-use") {
+        alert("Cannot create user, email already in use");
+      } else {
+        console.log("user creation encountered an error", error);
       }
-      if(error.code === "auth/weak-password") {
-        alert("Password must be at least 6 characters");
-      }
-      console.log(JSON.stringify(error));
     }
+  };
 
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
-  }
+    setFormFields({ ...formFields, [name]: value });
+  };
 
   return (
-    <div className={"sign-up-container"}>
-      <h2>Don't have an account</h2>
+    <div className="sign-up-container">
+      <h2>Don't have an account?</h2>
       <span>Sign up with your email and password</span>
       <form onSubmit={handleSubmit}>
         <FormInput
-          label={"Display Name"}
-          type={"text"}
-          required={true}
-          name={"displayName"}
+          label="Display Name"
+          type="text"
+          required
+          onChange={handleChange}
+          name="displayName"
           value={displayName}
-          onChange={handleChange}
         />
+
         <FormInput
-          label={"Email"}
-          type={"email"}
-          required={true}
-          name={"email"}
+          label="Email"
+          type="email"
+          required
+          onChange={handleChange}
+          name="email"
           value={email}
-          onChange={handleChange}
         />
+
         <FormInput
-          label={"Password"}
-          type={"password"}
-          required={true}
-          name={"password"}
+          label="Password"
+          type="password"
+          required
+          onChange={handleChange}
+          name="password"
           value={password}
-          onChange={handleChange}
         />
+
         <FormInput
-          label = "Confirm Password"
-          type={"password"}
-          required={true}
-          name={"confirmPassword"}
-          value={confirmPassword}
+          label="Confirm Password"
+          type="password"
+          required
           onChange={handleChange}
+          name="confirmPassword"
+          value={confirmPassword}
         />
-        <Button buttonType={"inverted"} type={"submit"} >Sign Up</Button>
+        <Button type="submit">Sign Up</Button>
       </form>
     </div>
   );
