@@ -1,4 +1,4 @@
-import styled from 'styled-compo    nents';
+import styled from 'styled-components';
 
 import {BaseButton, GoogleSignInButton, InvertedButton,} from '../button/button.styles';
 
