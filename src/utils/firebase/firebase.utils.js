@@ -51,9 +51,9 @@ export const createUserDocumentFromAuth = async (
     if (!userAuth) return;
     const db = getFirestore();
     const userDocRef = await doc(db, "users", userAuth.uid);
-    console.log(userDocRef);
+    // console.log(userDocRef);
     const userSnapshot = await getDoc(userDocRef);
-    console.log(userSnapshot.exists());
+    // console.log(userSnapshot.exists());
 
     if (!userSnapshot.exists()) {
         const {displayName, email} = userAuth;
@@ -99,11 +99,7 @@ export const getCategoriesAndDocuments = async () => {
     const collectionRef = collection(db, "categories");
     const q = query(collectionRef);
     const querySnapshot = await getDocs(q);
-    // console.log(querySnapshot);
-    return querySnapshot.docs.reduce((acc, docSnapshot) => {
-            const {title, items} = docSnapshot.data();
-            acc[title.toLowerCase()] = items;
-            return acc;
-        }
-        , {});
+    //
+    // return categoryMap
+    return querySnapshot.docs.map(docSnapshot => docSnapshot.data())
 }
