@@ -13,15 +13,10 @@ import {collection, doc, getDoc, getDocs, getFirestore, query, setDoc, writeBatc
 
 const firebaseConfig = {
     apiKey: "AIzaSyBrc5ZED0jvIgCCvxlrm2_mPJn_A079p0A",
-
     authDomain: "crwn-clothing-db-d4e8c.firebaseapp.com",
-
     projectId: "crwn-clothing-db-d4e8c",
-
     storageBucket: "crwn-clothing-db-d4e8c.appspot.com",
-
     messagingSenderId: "420919677836",
-
     appId: "1:420919677836:web:faf0e2b1faa4cdb16f3ca9",
 };
 
@@ -49,23 +44,30 @@ export const createUserDocumentFromAuth = async (
     additionalInformation = {}
 ) => {
     if (!userAuth) return;
-    const db = getFirestore();
-    const userDocRef = await doc(db, "users", userAuth.uid);
-    // console.log(userDocRef);
+
+    const userDocRef = doc(db, 'users', userAuth.uid);
+
     const userSnapshot = await getDoc(userDocRef);
-    // console.log(userSnapshot.exists());
 
     if (!userSnapshot.exists()) {
         const {displayName, email} = userAuth;
         const createdAt = new Date();
+
         try {
-            await setDoc(userDocRef, {displayName, email, createdAt, ...additionalInformation});
+            await setDoc(userDocRef, {
+                displayName,
+                email,
+                createdAt,
+                ...additionalInformation,
+            });
         } catch (error) {
-            console.log("Error creating the user ", error.message);
+            console.log('error creating the user', error.message);
         }
     }
-    return userDocRef;
+
+    return userSnapshot;
 };
+
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
     if (!email || !password) return;
@@ -83,7 +85,7 @@ export const signOutUser = async () => {
 export const onAuthStateChangedListener = (callback) =>
     onAuthStateChanged(auth, callback);
 
-export const addCollectionAndDocument = async (collectionKey, objectsToAdd) => {
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
     const collectionRef = collection(db, collectionKey);
     const batch = writeBatch(db);
     objectsToAdd.forEach((object) => {
@@ -103,3 +105,15 @@ export const getCategoriesAndDocuments = async () => {
     // return categoryMap
     return querySnapshot.docs.map(docSnapshot => docSnapshot.data())
 }
+export const getCurrentUser = () => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (userAuth) => {
+                unsubscribe();
+                resolve(userAuth);
+            },
+            reject
+        );
+    });
+};
